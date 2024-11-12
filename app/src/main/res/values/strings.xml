@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">EL-COACH</string>
+    <string name="app_name">ElCoach</string>
+    <string name="facebook_app_id">2692917247547625</string>
+    <string name="facebook_client_token">8f2e4938031c610327819cb6a687b80a</string>
 </resources>
