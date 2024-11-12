@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suppression des données utilisateur</title>
+</head>
+<body>
+    <h1>Suppression des données utilisateur</h1>
+    <p>Si vous souhaitez supprimer vos données personnelles de notre application, veuillez envoyer un e-mail à <a href="mailto:tonemail@example.com">tonemail@example.com</a> avec les informations suivantes :</p>
+    <ul>
+        <li>Votre nom complet</li>
+        <li>Votre identifiant utilisateur Facebook</li>
+        <li>Une brève description de la raison de la demande de suppression</li>
+    </ul>
+    <p>Nous traiterons votre demande de suppression dans les 30 jours suivant la réception de votre demande.</p>
+</body>
+</html>
