@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "tn.esprit.el_coach"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "tn.esprit.el_coach"
@@ -59,6 +59,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation("com.google.android.gms:play-services-auth:20.6.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
