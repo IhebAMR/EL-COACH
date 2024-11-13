@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { SignupDto } from './dtos/signup.dto';
@@ -12,6 +14,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThanOrEqual } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { RefreshToken } from 'src/refresh-token/refresh-token';
+import { ResetToken } from 'src/reset-token/reset-token';
+import { MailService } from 'src/services/mail.service';
+import { nanoid } from 'nanoid';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +24,8 @@ export class AuthService {
     @InjectRepository(User) private userRepository: Repository<User>,
     private jwtService: JwtService,
     @InjectRepository(RefreshToken) private refreshTokenRepo: Repository<RefreshToken>,
+    @InjectRepository(ResetToken) private resetTokenRepo: Repository<ResetToken>,
+    private mailService: MailService,
   ) {}
 
   async signup(signupData: SignupDto) {
@@ -96,6 +103,72 @@ export class AuthService {
       // Save a new refresh token
       await this.refreshTokenRepo.save({ userId, token, expiryDate });
     }
+  }
+  async changePassword(userId: number, oldPassword: string, newPassword: string) {
+    // Find the user
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found...');
+    }
+    const newHashedPassword = await bcrypt.hash(newPassword, 10);
+    // Compare the old password with the password in DB
+    const passwordMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!passwordMatch) {
+      throw new UnauthorizedException('Wrong credentials');
+    }
+
+    // Change user's password
+    
+    user.password = newHashedPassword;
+    await this.userRepository.save(user);
+  }
+
+  async forgotPassword(email: string) {
+    // Check that user exists
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    if (user) {
+      // If user exists, generate password reset token
+      const expiryDate = new Date();
+      expiryDate.setHours(expiryDate.getHours() + 1);
+
+      const resetToken = "token";
+      const resetTokenEntity = this.resetTokenRepo.create({
+        token: resetToken,
+        userId: user.id,
+        expiryDate,
+      });
+
+      await this.resetTokenRepo.save(resetTokenEntity);
+
+      // Send the link to the user by email
+      this.mailService.sendPasswordResetEmail(email, resetToken);
+    }
+
+    return { message: 'If this user exists, they will receive an email' };
+  }
+
+  async resetPassword(newPassword: string, resetToken: string) {
+    // Find a valid reset token document
+    const token = await this.resetTokenRepo.findOne({
+      where: { token: resetToken, expiryDate: MoreThanOrEqual(new Date()), },
+    });
+
+    if (!token) {
+      throw new UnauthorizedException('Invalid link');
+    }
+
+    // Change user password (MAKE SURE TO HASH!!)
+    const user = await this.userRepository.findOne({ where: { id: token.userId } });
+    if (!user) {
+      throw new InternalServerErrorException();
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await this.userRepository.save(user);
+
+    // Optionally delete the used reset token
+    await this.resetTokenRepo.delete({ id: token.id });
   }
   
   

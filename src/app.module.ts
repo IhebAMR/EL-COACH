@@ -10,6 +10,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from './auth/auth.module';
 import config from './config/config';
 import { RefreshToken } from './refresh-token/refresh-token';
+import { ResetToken } from './reset-token/reset-token';
 @Module({
   imports: [ConfigModule.forRoot({
     isGlobal: true,
@@ -31,9 +32,8 @@ import { RefreshToken } from './refresh-token/refresh-token';
     username: 'root',
     password: '',
     database: 'El Coach',
-    entities: [User,RefreshToken],
+    entities: [User,RefreshToken,ResetToken],
     synchronize: false,
-    autoLoadEntities: true,
     
   }), UserModule, AuthModule
 ],

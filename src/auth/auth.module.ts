@@ -4,13 +4,15 @@ import { AuthController } from './auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { RefreshToken } from 'src/refresh-token/refresh-token';
+import { ResetToken } from 'src/reset-token/reset-token';
+import { MailService } from 'src/services/mail.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, RefreshToken]),  // Register entities here
+    TypeOrmModule.forFeature([User, RefreshToken,ResetToken]),  // Register entities here
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, MailService],
   exports: [AuthService],
 })
 export class AuthModule {}
