@@ -1,3 +1,4 @@
+// MainActivity.kt
 package tn.esprit.el_coach
 
 import android.content.Intent
@@ -7,6 +8,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -29,7 +35,7 @@ class MainActivity : ComponentActivity() {
 
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
-        // Déclaration du ActivityResultLauncher avec le bon contrat
+        // Déclaration du ActivityResultLauncher pour la connexion Google
         val googleSignInLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
@@ -37,9 +43,7 @@ class MainActivity : ComponentActivity() {
                 try {
                     val account = GoogleSignIn.getSignedInAccountFromIntent(result.data)
                         .getResult(ApiException::class.java)
-                    // Traitez l'account ici (par exemple, récupérer l'email, nom, etc.)
-                    val email = account.email
-                    val displayName = account.displayName
+                    val displayName = account?.displayName
                     Toast.makeText(this, "Connecté avec Google: $displayName", Toast.LENGTH_SHORT).show()
                 } catch (e: ApiException) {
                     Toast.makeText(this, "Échec de la connexion Google", Toast.LENGTH_SHORT).show()
@@ -49,13 +53,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ELCOACHTheme {
-                // Passer la fonction de connexion Google à l'écran LoginScreen
-                LoginScreen(
-                    onGoogleLogin = { signInWithGoogle(googleSignInLauncher) },
-                    onToggle = { /* Autres actions */ },
-                    onForgotPassword = { /* Autres actions */ },
-                    onFacebookLogin = { /* Autres actions */ },
-                    onOutlookLogin = { /* Autres actions */ }
+                // Initialiser la navigation
+                val navController = rememberNavController()
+                AppNavigation(
+                    navController = navController,
+                    onGoogleLogin = { signInWithGoogle(googleSignInLauncher) }
                 )
             }
         }
@@ -65,5 +67,33 @@ class MainActivity : ComponentActivity() {
     private fun signInWithGoogle(googleSignInLauncher: ActivityResultLauncher<Intent>) {
         val signInIntent = googleSignInClient.signInIntent
         googleSignInLauncher.launch(signInIntent)
+    }
+}
+
+@Composable
+fun AppNavigation(
+    navController: NavHostController,
+    onGoogleLogin: () -> Unit
+) {
+    NavHost(navController = navController, startDestination = "login") {
+        composable("login") {
+            LoginScreen(
+                navController = navController,
+                onGoogleLogin = onGoogleLogin,
+                onToggle = { navController.navigate("signup") },
+                onForgotPassword = { /* Autres actions */ },
+                onFacebookLogin = { /* Autres actions */ },
+                onOutlookLogin = { /* Autres actions */ }
+
+            )
+        }
+
+        composable("signup") {
+            SignupScreen(
+                navController = navController,
+                onToggle = { navController.navigate("login") } // Naviguer vers l'écran de connexion
+            )
+        }
+
     }
 }

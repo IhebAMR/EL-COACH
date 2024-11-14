@@ -1,7 +1,6 @@
 package tn.esprit.el_coach.Screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,17 +15,24 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import tn.esprit.el_coach.R
+
 @Composable
 fun SignupScreen(
+    navController: NavController,
     modifier: Modifier = Modifier,
-    onToggle: () -> Unit
+    onToggle: () -> Unit,
+    signUpViewModel: SignUpViewModel = viewModel()
 ) {
+    val iconAndLabelColor = Color(0xFF2A4E62)
     Box(
         modifier = modifier.fillMaxSize()
     ) {
         Image(
-            painter = painterResource(id = R.drawable.background),
+            painter = painterResource(id = R.drawable.back2),
             contentDescription = "Background",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -41,22 +47,29 @@ fun SignupScreen(
             Text(
                 text = "SIGN UP",
                 style = MaterialTheme.typography.headlineMedium,
-                color = Color.White,
+                color = Color(0xFF001C2F),
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(top = 32.dp)
             )
 
             Spacer(modifier = Modifier.weight(1f))
+            Image(
+                painter = painterResource(id = R.drawable.logo3),
+                contentDescription = "Logo",
+                modifier = Modifier
+                    .size(250.dp)
+                    .padding(top = 32.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
 
             var fullName by remember { mutableStateOf("") }
             var email by remember { mutableStateOf("") }
             var password by remember { mutableStateOf("") }
             var confirmPassword by remember { mutableStateOf("") }
             var passwordVisible by remember { mutableStateOf(false) }
-
-            var passwordStrengthLevel by remember { mutableStateOf(0) }
-            var showStrengthIndicator by remember { mutableStateOf(false) }
 
             var fullNameError by remember { mutableStateOf<String?>(null) }
             var emailError by remember { mutableStateOf<String?>(null) }
@@ -69,22 +82,22 @@ fun SignupScreen(
                     fullName = it
                     fullNameError = if (it.isBlank()) "Full Name cannot be empty" else null
                 },
-                label = { Text("Full Name", color = Color.Black) },
+                label = { Text("Full Name", color = Color(0xFF2A4E62)) },
                 isError = fullNameError != null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(1.dp, Color.Black, shape = RoundedCornerShape(8.dp)),
+                    .border(1.dp, Color(0xFF2A4E62), shape = RoundedCornerShape(8.dp)),
                 leadingIcon = {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_name),
                         contentDescription = "Name Icon",
-                        tint = Color.Black
+                        tint = Color(0xFF2A4E62)
                     )
                 },
                 shape = RoundedCornerShape(8.dp),
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFFFFFFF),
-                    unfocusedContainerColor = Color(0xFFB1BAC7),
+                    focusedContainerColor = Color(0xFFFFF2DC),
+                    unfocusedContainerColor = Color(0xFFFFF2DC),
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 )
@@ -99,22 +112,22 @@ fun SignupScreen(
                     email = it
                     emailError = if (!android.util.Patterns.EMAIL_ADDRESS.matcher(it).matches()) "Invalid email address" else null
                 },
-                label = { Text("Email", color = Color.Black) },
+                label = { Text("Email", color = Color(0xFF2A4E62)) },
                 isError = emailError != null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(1.dp, Color.Black, shape = RoundedCornerShape(8.dp)),
+                    .border(1.dp, Color(0xFF2A4E62), shape = RoundedCornerShape(8.dp)),
                 leadingIcon = {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_email),
                         contentDescription = "Email Icon",
-                        tint = Color.Black
+                        tint = Color(0xFF2A4E62)
                     )
                 },
                 shape = RoundedCornerShape(8.dp),
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFFFFFFF),
-                    unfocusedContainerColor = Color(0xFFB1BAC7),
+                    focusedContainerColor = Color(0xFFFFF2DC),
+                    unfocusedContainerColor = Color(0xFFFFF2DC),
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 )
@@ -127,11 +140,9 @@ fun SignupScreen(
                 value = password,
                 onValueChange = {
                     password = it
-                    passwordStrengthLevel = calculatePasswordStrength(password)
-                    showStrengthIndicator = password.isNotEmpty()
                     passwordError = if (password.length < 8) "Password too short" else null
                 },
-                label = { Text("Password", color = Color.Black) },
+                label = { Text("Password", color = Color(0xFF2A4E62)) },
                 isError = passwordError != null,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
@@ -139,39 +150,29 @@ fun SignupScreen(
                         Icon(
                             painter = painterResource(id = if (passwordVisible) R.drawable.ic_visibility else R.drawable.ic_visibility_off),
                             contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                            tint = Color.Black
+                            tint = Color(0xFF2A4E62)
                         )
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(1.dp, Color.Black, shape = RoundedCornerShape(8.dp)),
+                    .border(1.dp, Color(0xFF2A4E62), shape = RoundedCornerShape(8.dp)),
                 leadingIcon = {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_lock),
                         contentDescription = "Password Icon",
-                        tint = Color.Black
+                        tint = Color(0xFF2A4E62)
                     )
                 },
                 shape = RoundedCornerShape(8.dp),
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFFFFFFF),
-                    unfocusedContainerColor = Color(0xFFB1BAC7),
+                    focusedContainerColor = Color(0xFFFFF2DC),
+                    unfocusedContainerColor = Color(0xFFFFF2DC),
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 )
             )
             passwordError?.let { Text(it, color = Color.Red, style = MaterialTheme.typography.bodySmall) }
-
-            if (showStrengthIndicator) {
-                Text(
-                    text = "Use at least 8 characters, including a mix of letters, numbers, and special symbols.",
-                    color = Color.White,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-                PasswordStrengthIndicator(strengthLevel = passwordStrengthLevel)
-            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -181,23 +182,23 @@ fun SignupScreen(
                     confirmPassword = it
                     confirmPasswordError = if (it != password) "Passwords do not match" else null
                 },
-                label = { Text("Confirm Password", color = Color.Black) },
+                label = { Text("Confirm Password", color = Color(0xFF2A4E62)) },
                 isError = confirmPasswordError != null,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(1.dp, Color.Black, shape = RoundedCornerShape(8.dp)),
+                    .border(1.dp, Color(0xFF2A4E62), shape = RoundedCornerShape(8.dp)),
                 leadingIcon = {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_lock),
                         contentDescription = "Confirm Password Icon",
-                        tint = Color.Black
+                        tint = Color(0xFF2A4E62)
                     )
                 },
                 shape = RoundedCornerShape(8.dp),
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFFFFFFF),
-                    unfocusedContainerColor = Color(0xFFB1BAC7),
+                    focusedContainerColor = Color(0xFFFFF2DC),
+                    unfocusedContainerColor = Color(0xFFFFF2DC),
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 )
@@ -209,26 +210,28 @@ fun SignupScreen(
             Button(
                 onClick = {
                     if (fullNameError == null && emailError == null && passwordError == null && confirmPasswordError == null) {
-                        // Proceed with signup logic
-                    } else {
-                        // Handle errors
+                        signUpViewModel.signUp(fullName, email, password)
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF001C2F))
             ) {
-                Text("Sign Up")
+                Text("Sign Up", color = Color.White)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             TextButton(onClick = onToggle) {
-                Text("Already have an account? Login", color = Color.White)
+                Text("Already have an account? Login", color = iconAndLabelColor)
             }
 
             Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
+
+
 
 @Composable
 fun PasswordStrengthIndicator(strengthLevel: Int) {
@@ -254,7 +257,10 @@ fun calculatePasswordStrength(password: String): Int {
 @Preview(showBackground = true)
 @Composable
 fun SignupScreenPreview() {
+    // Utilisation d'un NavController factice pour la prévisualisation
+    val navController = rememberNavController()
     SignupScreen(
-        onToggle = { /* Preview onToggle action */ }
+        navController = navController,
+        onToggle = { }
     )
 }

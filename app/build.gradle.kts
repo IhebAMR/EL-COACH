@@ -60,6 +60,12 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation("com.google.android.gms:play-services-auth:20.6.0")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0") // pour convertir JSON
+    implementation("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.navigation.compose) // pour les requêtes HTTP
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
